@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h1>Add Item for selection</h1>
+        <div>Product Name:</div>
+        <div>
+            <input type="text" id="product-name" placeholder="Add a new product">
+        </div>
+        <div>Price:</div>
+        <div>
+            <input type="number" id="product-price" placeholder="Specify price">
+        </div>
+        <div>Image:</div>
+        <div>
+            <input type="text" id="product-image" placeholder="Add a new URL">
+        </div>
+        <button onclick="createProduct()">Create Product</button> 
+    </div>
+    <div>
+        <h2>Product Dashboard</h2>
+        <div id="product-list"></div>
+    </div>
+
+    <div>
+        <h2>Product Form</h2>
+        <div id="cart-items"></div>
+        <button onclick="calcuLate()">Total Price</button>
+        <p>You have to pay: <span id="final-price">0</span></p>
+    </div>
+
+<script>
+    let products = [];
+    let cart = [];
+
+    function createProduct() {
+        const name = document.getElementById("product-name").value.trim();
+        const price = document.getElementById("product-price").value.trim();
+        const image = document.getElementById("product-image").value.trim();
+
+        if (name && price && image) {
+            const id = Date.now();
+            products.push({
+                id,
+                name,
+                price: parseFloat(price),
+                image
+            });
+            renderProducts();
+        }
+    }
+
+    function renderProducts() {
+        let productHTML = '';
+        products.forEach(product => {
+            productHTML += `
+                <div id="product-${product.id}">
+                    <input type="checkbox" onclick="toggleCart(${product.id})">
+                    <img src="${product.image}" width="100" height="100">
+                    <span>${product.name}</span>
+                    <span>$${product.price.toFixed(2)}</span>
+                </div>
+            `;
+        });
+        document.getElementById("product-list").innerHTML = productHTML;
+    }
+
+    function toggleCart(id) {
+        const product = products.find(p => p.id === id);
+        const inCart = cart.find(p => p.id === id);
+        if (inCart) {
+            cart = cart.filter(p => p.id !== id);
+        } else {
+            cart.push(product);
+        }
+        renderCart();
+    }
+
+    function renderCart() {
+        let cartHTML = '';
+        cart.forEach(product => {
+            cartHTML += `
+                <div>
+                    <img src="${product.image}" width="100" height="100">
+                    <span>${product.name}</span>
+                    <span>$${product.price.toFixed(2)}</span>
+                    <button onclick="removeFrom(${product.id})">Remove</button>
+                </div>
+            `;
+        });
+        document.getElementById("cart-items").innerHTML = cartHTML;
+    }
+
+    function removeFrom(id) {
+        cart = cart.filter(p => p.id !== id);
+        renderCart();
+    }
+
+    function calcuLate() {
+        const total = cart.reduce((sum, product) => sum + product.price, 0);
+        document.getElementById("final-price").textContent = total.toFixed(2);
+    }
+</script>
+</body>
+</html>
